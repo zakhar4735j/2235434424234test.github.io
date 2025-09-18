@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Система экстренной помощи</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: #1a2a6c;
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .header-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #ff6b6b;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .info-box {
+            background: #f8f9fa;
+            border-left: 5px solid #1a2a6c;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 5px;
+        }
+        
+        .info-box h3 {
+            color: #1a2a6c;
+            margin-bottom: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #1a2a6c;
+        }
+        
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: #1a2a6c;
+            box-shadow: 0 0 0 3px rgba(26, 42, 108, 0.2);
+        }
+        
+        .location-data {
+            background: #e9f7ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .location-data h3 {
+            color: #1a2a6c;
+            margin-bottom: 10px;
+        }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            background: #1a2a6c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            text-align: center;
+        }
+        
+        .btn:hover {
+            background: #233a80;
+        }
+        
+        .btn-location {
+            background: #ff6b6b;
+        }
+        
+        .btn-location:hover {
+            background: #ff5252;
+        }
+        
+        .status-indicator {
+            text-align: center;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .loading {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+        }
+        
+        .map-container {
+            height: 200px;
+            margin: 20px 0;
+            border-radius: 8px;
+            overflow: hidden;
+            display: none;
+            background: #eee;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-icon">
+                <i class="fas fa-hands-helping"></i>
+            </div>
+            <h1>Система экстренной помощи</h1>
+            <p>Отправьте ваше местоположение и информацию о помощи, которая вам требуется</p>
+        </div>
+        
+        <div class="content">
+            <div class="info-box">
+                <h3>Как это работает?</h3>
+                <p>Система позволяет отправить ваше точное местоположение и описание проблемы на нашу почту для оперативного реагирования служб помощи.</p>
+            </div>
+            
+            <form id="helpForm" action="https://formsubmit.co/greenmooncreator@gmail.com" method="POST">
+                <input type="hidden" name="latitude" id="latitude">
+                <input type="hidden" name="longitude" id="longitude">
+                <input type="hidden" name="accuracy" id="accuracy">
+                <input type="hidden" name="_subject" value="Запрос помощи из системы">
+                <input type="hidden" name="_template" value="table">
+                
+                <div class="form-group">
+                    <label for="name">Ваше имя</label>
+                    <input type="text" id="name" name="name" required placeholder="Введите ваше имя">
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone">Контактный телефон</label>
+                    <input type="tel" id="phone" name="phone" required placeholder="Введите ваш телефон">
+                </div>
+                
+                <div class="form-group">
+                    <label for="problem">Опишите проблему</label>
+                    <textarea id="problem" name="problem" rows="4" required placeholder="Опишите подробно, какая помощь вам требуется"></textarea>
+                </div>
+                
+                <button type="button" id="getLocationBtn" class="btn btn-location">
+                    <i class="fas fa-map-marker-alt"></i> Определить мое местоположение
+                </button>
+                
+                <div id="locationStatus" class="status-indicator loading">
+                    <i class="fas fa-spinner fa-spin"></i> Определяем ваше местоположение...
+                </div>
+                
+                <div id="locationData" class="location-data">
+                    <h3>Ваше местоположение определено</h3>
+                    <p>Широта: <span id="latValue"></span></p>
+                    <p>Долгота: <span id="lngValue"></span></p>
+                    <p>Точность: <span id="accValue"></span> метров</p>
+                </div>
+                
+                <div id="mapContainer" class="map-container">
+                    <!-- Карта будет отображена здесь -->
+                </div>
+                
+                <div id="formStatus" class="status-indicator"></div>
+                
+                <button type="submit" id="submitBtn" class="btn" disabled>
+                    <i class="fas fa-paper-plane"></i> Отправить запрос на помощь
+                </button>
+            </form>
+        </div>
+        
+        <div class="footer">
+            <p>Система помощи &copy; 2023 | Ваши данные защищены и будут использованы только для оказания помощи</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const getLocationBtn = document.getElementById('getLocationBtn');
+            const locationStatus = document.getElementById('locationStatus');
+            const locationData = document.getElementById('locationData');
+            const latInput = document.getElementById('latitude');
+            const lngInput = document.getElementById('longitude');
+            const accInput = document.getElementById('accuracy');
+            const latValue = document.getElementById('latValue');
+            const lngValue = document.getElementById('lngValue');
+            const accValue = document.getElementById('accValue');
+            const submitBtn = document.getElementById('submitBtn');
+            const formStatus = document.getElementById('formStatus');
+            const mapContainer = document.getElementById('mapContainer');
+            const helpForm = document.getElementById('helpForm');
+            
+            // Функция для получения геолокации
+            function getLocation() {
+                if (!navigator.geolocation) {
+                    showStatus("Геолокация не поддерживается вашим браузером", "error");
+                    return;
+                }
+                
+                locationStatus.style.display = 'block';
+                locationStatus.className = 'status-indicator loading';
+                locationStatus.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Определяем ваше местоположение...';
+                
+                navigator.geolocation.getCurrentPosition(
+                    showPosition,
+                    handleError,
+                    {enableHighAccuracy: true, timeout: 10000, maximumAge: 0}
+                );
+            }
+            
+            // Функция для отображения позиции
+            function showPosition(position) {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                const acc = position.coords.accuracy;
+                
+                // Заполняем скрытые поля формы
+                latInput.value = lat;
+                lngInput.value = lng;
+                accInput.value = acc;
+                
+                // Показываем данные пользователю
+                latValue.textContent = lat.toFixed(6);
+                lngValue.textContent = lng.toFixed(6);
+                accValue.textContent = acc.toFixed(2);
+                
+                // Показываем блок с данными о местоположении
+                locationData.style.display = 'block';
+                locationStatus.style.display = 'none';
+                
+                // Активируем кнопку отправки
+                submitBtn.disabled = false;
+                
+                // Показываем упрощенную карту
+                showSimpleMap(lat, lng);
+                
+                // Добавляем ссылку на Google Maps
+                const mapsLink = document.createElement('p');
+                mapsLink.innerHTML = `<a href="https://www.google.com/maps?q=${lat},${lng}" target="_blank">Открыть в Google Maps</a>`;
+                locationData.appendChild(mapsLink);
+            }
+            
+            // Функция для обработки ошибок
+            function handleError(error) {
+                let errorMessage;
+                
+                switch(error.code) {
+                    case error.PERMISSION_DENIED:
+                        errorMessage = "Доступ к геолокации запрещен. Разрешите доступ в настройках браузера.";
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        errorMessage = "Информация о местоположении недоступна.";
+                        break;
+                    case error.TIMEOUT:
+                        errorMessage = "Время запроса местоположения истекло.";
+                        break;
+                    default:
+                        errorMessage = "Произошла неизвестная ошибка.";
+                        break;
+                }
+                
+                showStatus(errorMessage, "error");
+            }
+            
+            // Функция для отображения статуса
+            function showStatus(message, type) {
+                formStatus.textContent = message;
+                formStatus.className = `status-indicator ${type}`;
+                formStatus.style.display = 'block';
+                
+                if (type === 'success') {
+                    formStatus.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+                } else if (type === 'error') {
+                    formStatus.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${message}`;
+                }
+                
+                locationStatus.style.display = 'none';
+            }
+            
+            // Функция для показа упрощенной карты
+            function showSimpleMap(lat, lng) {
+                mapContainer.style.display = 'block';
+                mapContainer.innerHTML = `
+                    <div style="width:100%; height:100%; display:flex; justify-content:center; align-items:center; flex-direction:column; background:#eef5ff;">
+                        <i class="fas fa-map-marker-alt" style="font-size:48px; color:#ff6b6b;"></i>
+                        <p style="margin-top:10px; text-align:center;">Ваше местоположение определено<br>Широта: ${lat.toFixed(6)}<br>Долгота: ${lng.toFixed(6)}</p>
+                        <p style="margin-top:5px; font-size:12px;">(Для просмотра детальной карты используйте ссылку выше)</p>
+                    </div>
+                `;
+            }
+            
+            // Обработчик отправки формы
+            helpForm.addEventListener('submit', function(e) {
+                if (!latInput.value || !lngInput.value) {
+                    e.preventDefault();
+                    showStatus("Сначала определите ваше местоположение", "error");
+                    return;
+                }
+                
+                showStatus("Отправляем запрос на помощь...", "loading");
+                submitBtn.disabled = true;
+                
+                // Форма будет отправлена на FormSubmit
+            });
+            
+            // Обработчик клика на кнопке получения геолокации
+            getLocationBtn.addEventListener('click', getLocation);
+        });
+    </script>
+</body>
+</html>
